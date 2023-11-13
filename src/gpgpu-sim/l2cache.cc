@@ -352,8 +352,16 @@ void memory_partition_unit::dram_cycle() {
           spid);
       dram_delay_t d;
       d.req = mf;
-      d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle +
-                      m_config->dram_latency;
+      int modified_dram_latency;
+      if(mf->is_write()){
+	      modified_dram_latency = m_config->dram_latency+5;
+	      //modified_dram_latency = m_config->dram_latency;
+      }else{
+	      modified_dram_latency = m_config->dram_latency;
+      }
+      	d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle +
+                      modified_dram_latency;
+      //std::cout<<"dram_latency: "<<modified_dram_latency<<std::endl;
       m_dram_latency_queue.push_back(d);
       mf->set_status(IN_PARTITION_DRAM_LATENCY_QUEUE,
                      m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
