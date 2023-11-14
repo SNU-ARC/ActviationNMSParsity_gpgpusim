@@ -255,6 +255,8 @@ class memory_config {
     dram_atom_size =
         BL * busW * gpu_n_mem_per_ctrlr;  // burst length x bus width x # chips
                                           // per partition
+    //std::cout<<"[YS] dram atom size: "<<dram_atom_size<<"BL: "<<BL<<", busW: "<<busW<<", gpu_n_mem_per_ctrlr: "<<gpu_n_mem_per_ctrlr<<std::endl;
+    //exit(1);
 
     assert(m_n_sub_partition_per_memory_channel > 0);
     assert((nbk % m_n_sub_partition_per_memory_channel == 0) &&

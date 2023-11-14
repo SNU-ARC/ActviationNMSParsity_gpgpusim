@@ -294,7 +294,12 @@ void dram_t::cycle() {
       printf("\tDQ: BK%d Row:%03x Col:%03x", cmd->bk, cmd->row,
              cmd->col + cmd->dqbytes);
 #endif
+      if(cmd->data->is_write()){
+        //cmd->nbytes = 64;
+        std::cout<<"[YS] dqbytes: "<<cmd->dqbytes<<", nbytes: "<<cmd->nbytes<<std::endl;
+      }
       cmd->dqbytes += m_config->dram_atom_size;
+      int test;
 
       if (cmd->dqbytes >= cmd->nbytes) {
         mem_fetch *data = cmd->data;
@@ -302,9 +307,18 @@ void dram_t::cycle() {
                          m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
         if (data->get_access_type() != L1_WRBK_ACC &&
             data->get_access_type() != L2_WRBK_ACC) {
+          //if(cmd->data->is_write()){
+          ////test = data->get_access_type()==READ_REQUEST? 0:data->get_access_type()==WRITE_REQUEST?1:data->get_access_type()==READ_REPLY?2:data->get_access_type()==WRITE_ACK?3:4;
+          //  std::cout<<"[YS] access_type: "<<data->get_access_type()<<", set_reply"<<test<<std::endl;
+          //}
           data->set_reply();
           returnq->push(data);
         } else {
+          //if(cmd->data->is_write()){
+          //  //test = data->get_access_type()==READ_REQUEST? 0:data->get_access_type()==WRITE_REQUEST?1:data->get_access_type()==READ_REPLY?2:data->get_access_type()==WRITE_ACK?3:4;
+          ////std::cout<<"[YS] access_type: "<<data->get_access_type()<<", set_done"<<std::endl;
+          //  std::cout<<"[YS] access_type: "<<data->get_access_type()<<", set_done"<<test<<std::endl;
+          //}
           m_memory_partition_unit->set_done(data);
           delete data;
         }

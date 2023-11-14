@@ -1061,6 +1061,9 @@ void baseline_cache::cycle() {
     if (!m_memport->full(mf->size(), mf->get_is_write())) {
       m_miss_queue.pop_front();
       m_memport->push(mf);
+      //if(mf->is_write()){
+      //  std::cout<<"[YS] "<<m_name<<" write evict - mf->get_data_size: "<<mf->get_data_size()<<std::endl;
+      //}
     }
   }
   bool data_port_busy = !m_bandwidth_management.data_port_free();

@@ -351,17 +351,26 @@ void memory_partition_unit::dram_cycle() {
           "Issue mem_fetch request %p from sub partition %d to dram\n", mf,
           spid);
       dram_delay_t d;
+
+      // [YS] size reduction start
+      if(mf->is_write()){
+        mf->set_data_size(mf->get_data_size()/2);
+        // FIXME address should be modified here
+      }
+
+
       d.req = mf;
       int modified_dram_latency;
       if(mf->is_write()){
-	      modified_dram_latency = m_config->dram_latency+5;
-	      //modified_dram_latency = m_config->dram_latency;
+	      //modified_dram_latency = m_config->dram_latency+5;
+	      modified_dram_latency = m_config->dram_latency;
+        //std::cout<<"[YS] mf->get_data_size: "<<mf->get_data_size()<<std::endl;
       }else{
 	      modified_dram_latency = m_config->dram_latency;
       }
       	d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle +
                       modified_dram_latency;
-      //std::cout<<"dram_latency: "<<modified_dram_latency<<std::endl;
+      //std::cout<<"[YS] modified_dram_latency: "<<modified_dram_latency<<std::endl;
       m_dram_latency_queue.push_back(d);
       mf->set_status(IN_PARTITION_DRAM_LATENCY_QUEUE,
                      m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
