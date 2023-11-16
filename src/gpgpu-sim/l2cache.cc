@@ -48,6 +48,9 @@
 #include "mem_latency_stat.h"
 #include "shader.h"
 
+//#define WR_TRAFFIC_HALF_EN 1
+//#define COMP_LATENCY 10
+
 mem_fetch *partition_mf_allocator::alloc(new_addr_type addr,
                                          mem_access_type type, unsigned size,
                                          bool wr,
@@ -352,18 +355,22 @@ void memory_partition_unit::dram_cycle() {
           spid);
       dram_delay_t d;
 
+#if WR_TRAFFIC_HALF_EN==1
       // [YS] size reduction start
       if(mf->is_write()){
         mf->set_data_size(mf->get_data_size()/2);
         // FIXME address should be modified here
+        //std::cout<<"[YS] comp_en1 "<<std::endl;
       }
+#endif
 
 
       d.req = mf;
       int modified_dram_latency;
       if(mf->is_write()){
-	      //modified_dram_latency = m_config->dram_latency+5;
-	      modified_dram_latency = m_config->dram_latency;
+	      modified_dram_latency = m_config->dram_latency+COMP_LATENCY;
+        //std::cout<<"[YS] modified_dram_latency: "<<modified_dram_latency<<std::endl;
+        //std::cout<<"[YS] comp_en2 "<<std::endl;
         //std::cout<<"[YS] mf->get_data_size: "<<mf->get_data_size()<<std::endl;
       }else{
 	      modified_dram_latency = m_config->dram_latency;

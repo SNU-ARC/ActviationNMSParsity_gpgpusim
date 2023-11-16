@@ -294,10 +294,10 @@ void dram_t::cycle() {
       printf("\tDQ: BK%d Row:%03x Col:%03x", cmd->bk, cmd->row,
              cmd->col + cmd->dqbytes);
 #endif
-      if(cmd->data->is_write()){
-        //cmd->nbytes = 64;
-        std::cout<<"[YS] dqbytes: "<<cmd->dqbytes<<", nbytes: "<<cmd->nbytes<<std::endl;
-      }
+      //if(cmd->data->is_write()){
+      //  //cmd->nbytes = 64;
+      //  //std::cout<<"[YS] dqbytes: "<<cmd->dqbytes<<", nbytes: "<<cmd->nbytes<<std::endl;
+      //}
       cmd->dqbytes += m_config->dram_atom_size;
       int test;
 
