@@ -49,7 +49,7 @@
 #include "shader.h"
 
 //#define WR_TRAFFIC_HALF_EN 1
-//#define COMP_LATENCY 10
+//#define COMP_LATENCY 0
 
 mem_fetch *partition_mf_allocator::alloc(new_addr_type addr,
                                          mem_access_type type, unsigned size,
