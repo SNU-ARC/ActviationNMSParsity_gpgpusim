@@ -369,16 +369,18 @@ void memory_partition_unit::dram_cycle() {
       int modified_dram_latency;
       if(mf->is_write()){
 	      modified_dram_latency = m_config->dram_latency+COMP_LATENCY;
+      	d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle + modified_dram_latency;
+        m_dram_latency_queue_wr.push_back(d);
         //std::cout<<"[YS] modified_dram_latency: "<<modified_dram_latency<<std::endl;
         //std::cout<<"[YS] comp_en2 "<<std::endl;
         //std::cout<<"[YS] mf->get_data_size: "<<mf->get_data_size()<<std::endl;
       }else{
 	      modified_dram_latency = m_config->dram_latency;
+      	d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle + modified_dram_latency;
+        m_dram_latency_queue.push_back(d);
       }
-      	d.ready_cycle = m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle +
-                      modified_dram_latency;
       //std::cout<<"[YS] modified_dram_latency: "<<modified_dram_latency<<std::endl;
-      m_dram_latency_queue.push_back(d);
+      //m_dram_latency_queue.push_back(d);
       mf->set_status(IN_PARTITION_DRAM_LATENCY_QUEUE,
                      m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle);
       m_arbitration_metadata.borrow_credit(spid);
@@ -387,6 +389,7 @@ void memory_partition_unit::dram_cycle() {
   }
   //}
 
+  // read request
   // DRAM latency queue
   if (!m_dram_latency_queue.empty() &&
       ((m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle) >=
@@ -395,7 +398,21 @@ void memory_partition_unit::dram_cycle() {
     mem_fetch *mf = m_dram_latency_queue.front().req;
     m_dram_latency_queue.pop_front();
     m_dram->push(mf);
+    return;
   }
+
+  // write request
+  // DRAM latency queue
+  if (!m_dram_latency_queue_wr.empty() &&
+      ((m_gpu->gpu_sim_cycle + m_gpu->gpu_tot_sim_cycle) >=
+       m_dram_latency_queue_wr.front().ready_cycle) &&
+      m_dram_latency_queue_wr.front().req->is_write() &&
+      !m_dram->full(m_dram_latency_queue_wr.front().req->is_write())) {
+    mem_fetch *mf = m_dram_latency_queue_wr.front().req;
+    m_dram_latency_queue_wr.pop_front();
+    m_dram->push(mf);
+  }
+
 }
 
 void memory_partition_unit::set_done(mem_fetch *mf) {

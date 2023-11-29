@@ -153,6 +153,7 @@ class memory_partition_unit {
     class mem_fetch *req;
   };
   std::list<dram_delay_t> m_dram_latency_queue;
+  std::list<dram_delay_t> m_dram_latency_queue_wr;
 
   class gpgpu_sim *m_gpu;
 };
